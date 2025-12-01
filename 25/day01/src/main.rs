@@ -1,10 +1,12 @@
 use std::io;
-use utils::read_lines;
+use utils::{Part, read_lines};
 
 fn main() -> io::Result<()> {
     let raw_lines = read_lines("input.txt")?;
-    let result = part_1(raw_lines)?;
-    println!("{result}");
+    let part_1 = get_password(Part::One, raw_lines.clone())?;
+    let part_2 = get_password(Part::Two, raw_lines)?;
+    println!("part 1: {part_1}");
+    println!("part 2: {part_2}");
     Ok(())
 }
 
@@ -18,19 +20,6 @@ impl RingBuffer {
         RingBuffer {
             index: 50,
             zero_sum: 0,
-        }
-    }
-
-    fn rotate(&mut self, direction: String, distance: u32) {
-        for _ in 0..distance {
-            match direction.as_str() {
-                "L" => self.left(),
-                "R" => self.right(),
-                s => panic!("expected L or R, got {}", s),
-            }
-        }
-        if self.index == 0 {
-            self.zero_sum += 1;
         }
     }
 
@@ -49,14 +38,44 @@ impl RingBuffer {
             self.index += 1;
         }
     }
+
+    fn rotate_part1(&mut self, direction: String, distance: u32) {
+        for _ in 0..distance {
+            match direction.as_str() {
+                "L" => self.left(),
+                "R" => self.right(),
+                s => panic!("expected L or R, got {}", s),
+            }
+        }
+        if self.index == 0 {
+            self.zero_sum += 1;
+        }
+    }
+
+    fn rotate_part2(&mut self, direction: String, distance: u32) {
+        for _ in 0..distance {
+            match direction.as_str() {
+                "L" => self.left(),
+                "R" => self.right(),
+                s => panic!("expected L or R, got {}", s),
+            }
+            if self.index == 0 {
+                self.zero_sum += 1;
+            }
+        }
+    }
 }
 
-fn part_1(raw_lines: Vec<String>) -> io::Result<u32> {
+fn get_password(part: Part, raw_lines: Vec<String>) -> io::Result<u32> {
     let lines = parse_lines(raw_lines);
     let mut ring_buf = RingBuffer::new();
 
+    let op = match part {
+        Part::One => RingBuffer::rotate_part1,
+        Part::Two => RingBuffer::rotate_part2,
+    };
     for line in lines {
-        ring_buf.rotate(line.0, line.1);
+        op(&mut ring_buf, line.0, line.1);
     }
 
     Ok(ring_buf.zero_sum)

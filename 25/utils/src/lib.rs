@@ -8,3 +8,8 @@ pub fn read_lines(file_path: &str) -> io::Result<Vec<String>> {
     let reader = BufReader::new(file);
     reader.lines().collect::<Result<_, _>>()
 }
+
+pub enum Part {
+    One,
+    Two,
+}

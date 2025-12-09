@@ -1,11 +1,6 @@
 use std::io;
 use utils::{Part, read_lines};
 
-pub type Instruction = (String, u32);
-
-const END_POS: u32 = 99;
-const START_POS: u32 = 50;
-
 fn main() -> io::Result<()> {
     let raw_lines = read_lines("input.txt")?;
     let instructions = parse_lines(raw_lines);
@@ -15,6 +10,8 @@ fn main() -> io::Result<()> {
     println!("part 2: {part_2}");
     Ok(())
 }
+
+pub type Instruction = (String, u32);
 
 fn get_password(part: Part, instructions: &Vec<Instruction>) -> io::Result<u32> {
     let mut ring_buf = RingBuffer::new();
@@ -30,9 +27,12 @@ struct RingBuffer {
 }
 
 impl RingBuffer {
+    const END_POS: u32 = 99;
+    const START_POS: u32 = 50;
+
     fn new() -> Self {
         RingBuffer {
-            index: START_POS,
+            index: RingBuffer::START_POS,
             zero_count: 0,
         }
     }
@@ -55,14 +55,14 @@ impl RingBuffer {
 
     fn left(&mut self) {
         if self.index == 0 {
-            self.index = END_POS;
+            self.index = RingBuffer::END_POS;
         } else {
             self.index -= 1;
         }
     }
 
     fn right(&mut self) {
-        if self.index >= END_POS {
+        if self.index >= RingBuffer::END_POS {
             self.index = 0;
         } else {
             self.index += 1;
